@@ -11,6 +11,11 @@
 #include "zeek/Reporter.h"
 #include "zeek/ZeekString.h"
 
+// Changes by Sata: Start
+#include <iostream>
+#include <string>
+// Changes by Sata: End
+
 namespace zeek::detail {
 
 std::unique_ptr<EventTraceMgr> etm;
@@ -969,8 +974,14 @@ EventTraceMgr::~EventTraceMgr() {
     if ( bt )
         fprintf(f, "global __base_time = %.06f;\n\n", bt);
 
-    for ( auto& e : events )
+    for ( auto& e : events ) {
+        // Changes by Sata: Start
+        std::string ev_name = e->GetName();
+        if ( ev_name.find("http_header") != std::string::npos )
+            continue;
+        // Changes by Sata: End
         fprintf(f, "global %s: event();\n", e->GetName());
+    }
 
     fprintf(f, "\nevent zeek_init() &priority=-999999\n");
     fprintf(f, "\t{\n");
